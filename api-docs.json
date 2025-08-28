@@ -152,6 +152,16 @@
                     "required": true
                 },
                 "responses": {
+                    "404": {
+                        "description": "Venta cancelada o información inválida",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SaleBadRequestResponse"
+                                }
+                            }
+                        }
+                    },
                     "200": {
                         "description": "Venta confirmada con éxito",
                         "content": {
@@ -168,16 +178,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SaleInternalErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Venta cancelada o información inválida",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SaleBadRequestResponse"
                                 }
                             }
                         }
@@ -466,6 +466,16 @@
                     }
                 ],
                 "responses": {
+                    "200": {
+                        "description": "Asientos obtenidos correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SeatOkResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Sin contenido disponible para mostrar",
                         "content": {
@@ -482,16 +492,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SeatInternalErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Asientos obtenidos correctamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SeatOkResponse"
                                 }
                             }
                         }
@@ -657,26 +657,6 @@
                     }
                 ],
                 "responses": {
-                    "429": {
-                        "description": "Demasiadas solicitudes",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ItineraryTooManyRequestsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Itinerarios obtenidos correctamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ItineraryOkResponse"
-                                }
-                            }
-                        }
-                    },
                     "204": {
                         "description": "No se encontraron itinerarios disponibles",
                         "content": {
@@ -693,6 +673,26 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ItineraryInternalErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Demasiadas solicitudes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItineraryTooManyRequestsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Itinerarios obtenidos correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItineraryOkResponse"
                                 }
                             }
                         }
@@ -784,22 +784,22 @@
                 "description": "Confirma que la API esté operativa y que haya conexión válida a la base de datos.",
                 "operationId": "health",
                 "responses": {
-                    "200": {
-                        "description": "El servicio está operativo",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HealthOkReponse"
-                                }
-                            }
-                        }
-                    },
                     "503": {
                         "description": "El servicio no está disponible temporalmente",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/HealthUnavailableReponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "El servicio está operativo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthOkReponse"
                                 }
                             }
                         }
@@ -1192,6 +1192,23 @@
                 },
                 "description": "Datos devueltos al procesar un pago exitoso."
             },
+            "SaleBadRequestResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 404
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Ocurrió un error. Por favor, verifica que la información enviada sea correcta"
+                    }
+                },
+                "description": "Bad Request"
+            },
             "SaleBodyResponse": {
                 "type": "object",
                 "properties": {
@@ -1333,23 +1350,6 @@
                 },
                 "description": "Internal Server Error"
             },
-            "SaleBadRequestResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 404
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Ocurrió un error. Por favor, verifica que la información enviada sea correcta"
-                    }
-                },
-                "description": "Bad Request"
-            },
             "UnReserveSeatOkResponse": {
                 "type": "object",
                 "properties": {
@@ -1488,6 +1488,64 @@
                 },
                 "description": "Internal Server Error"
             },
+            "Cupons": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "Tipos de descuento disponibles",
+                        "example": "PROMO99_AMOUNT",
+                        "enum": [
+                            "NO_DISCOUNT",
+                            "PERCENTAGE_DISCOUNT",
+                            "AMOUNT_DISCOUNT",
+                            "PROMO99_PERCENTAGE",
+                            "PROMO99_AMOUNT",
+                            "ESPECIAL"
+                        ]
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Código del cupón",
+                        "example": "PROMO99"
+                    }
+                },
+                "description": "Tipo y código del cupón"
+            },
+            "PassengerReserve": {
+                "required": [
+                    "seats",
+                    "type"
+                ],
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "Tipo de pasajero. PNOS=Adulto, PCIL=Niño, PSOE=INAPAM",
+                        "example": "PNOS",
+                        "enum": [
+                            "PNOS",
+                            "PCIL",
+                            "PSOE"
+                        ]
+                    },
+                    "seats": {
+                        "type": "array",
+                        "description": "Lista de asientos asignados a este pasajero",
+                        "items": {
+                            "$ref": "#/components/schemas/SeatReserve"
+                        }
+                    },
+                    "cupons": {
+                        "type": "array",
+                        "description": "Lista de cupones aplicables a este pasajero",
+                        "items": {
+                            "$ref": "#/components/schemas/Cupons"
+                        }
+                    }
+                },
+                "description": "Representa a un pasajero dentro de la reservación"
+            },
             "ReservationCreateBodyRequest": {
                 "required": [
                     "arrivalStation",
@@ -1568,7 +1626,7 @@
                         "type": "array",
                         "description": "Lista de pasajeros a reservar",
                         "items": {
-                            "$ref": "#/components/schemas/Passenger"
+                            "$ref": "#/components/schemas/PassengerReserve"
                         }
                     }
                 },
@@ -1678,44 +1736,160 @@
                 },
                 "description": "Conflict"
             },
-            "SeatNoContentResponse": {
+            "AppliedDiscount": {
                 "type": "object",
                 "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado de la respuesta HTTP",
-                        "format": "int32",
-                        "example": 404
-                    },
-                    "message": {
+                    "type": {
                         "type": "string",
-                        "description": "Mensaje descriptivo de la respuesta",
-                        "example": "Sin contenido disponible para mostrar"
+                        "description": "Tipos de descuento disponibles",
+                        "example": "PERCENTAGE_DISCOUNT",
+                        "enum": [
+                            "NO_DISCOUNT",
+                            "PERCENTAGE_DISCOUNT",
+                            "AMOUNT_DISCOUNT",
+                            "PROMO99_PERCENTAGE",
+                            "PROMO99_AMOUNT",
+                            "ESPECIAL"
+                        ]
                     },
-                    "body": {
-                        "type": "object",
-                        "description": "Objeto nulo; no se encontraron asientos disponibles",
-                        "nullable": true
+                    "passengerType": {
+                        "type": "string",
+                        "description": "Tipos de pasajero. PNOS=Adulto, PCIL=Niño, PSOE=INAPAM",
+                        "example": "PNOS",
+                        "enum": [
+                            "PNOS",
+                            "PCIL",
+                            "PSOE"
+                        ]
+                    },
+                    "busFloor": {
+                        "type": "integer",
+                        "description": "Piso del autobús en el que aplica el descuento. 0 = Aplica para todos los pisos o si el autobús cuenta con un solo piso, 1 = Planta baja, 2 = Planta alta",
+                        "format": "int32",
+                        "example": 1,
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "Valor del descuento (porcentaje o monto)",
+                        "example": 30
+                    },
+                    "basePrice": {
+                        "type": "number",
+                        "description": "Precio base antes de descuentos",
+                        "example": 255
+                    },
+                    "finalPrice": {
+                        "type": "number",
+                        "description": "Precio final después de aplicar descuentos",
+                        "example": 178.5
                     }
                 },
-                "description": "No Content"
+                "description": "Detalle de un descuento aplicado"
             },
-            "SeatInternalErrorResponse": {
+            "Coupon": {
                 "type": "object",
                 "properties": {
                     "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 500
-                    },
-                    "message": {
                         "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Internal Server Error"
+                        "description": "Código del cupón",
+                        "example": "PROMO99"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Tipos de descuento disponibles",
+                        "example": "PROMO99_AMOUNT",
+                        "enum": [
+                            "NO_DISCOUNT",
+                            "PERCENTAGE_DISCOUNT",
+                            "AMOUNT_DISCOUNT",
+                            "PROMO99_PERCENTAGE",
+                            "PROMO99_AMOUNT",
+                            "ESPECIAL"
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción del cupón",
+                        "example": "Promoción especial de $99 por boleto"
+                    },
+                    "maxSeats": {
+                        "type": "integer",
+                        "description": "Número máximo de boletos que puede cubrir el cupón. Si el valor es 0, significa que no hay límite; en caso contrario, está limitado por el valor de remainingSeats",
+                        "format": "int32",
+                        "example": 2
+                    },
+                    "remainingSeats": {
+                        "type": "integer",
+                        "description": "Número de boletos restantes que pueden usar el cupón",
+                        "format": "int32",
+                        "example": 1
+                    },
+                    "appliesTo": {
+                        "type": "array",
+                        "description": "Tipos de pasajero a los que aplica el cupón. PNOS=Adulto, PCIL=Niño, PSOE=INAPAM",
+                        "example": [
+                            "PNOS",
+                            "PCIL"
+                        ],
+                        "items": {
+                            "type": "string",
+                            "description": "Tipos de pasajero a los que aplica el cupón. PNOS=Adulto, PCIL=Niño, PSOE=INAPAM",
+                            "example": "[\"PNOS\",\"PCIL\"]",
+                            "enum": [
+                                "PNOS",
+                                "PCIL",
+                                "PSOE"
+                            ]
+                        },
+                        "enum": [
+                            "PNOS",
+                            "PCIL",
+                            "PSOE"
+                        ]
+                    },
+                    "busFloor": {
+                        "type": "integer",
+                        "description": "Piso del autobús en el que aplica el descuento. 0 = Todos 1 = Planta baja, 2 = Planta alta",
+                        "format": "int32",
+                        "example": 1,
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
+                    },
+                    "note": {
+                        "type": "string",
+                        "description": "Notas adicionales sobre la aplicación del cupón",
+                        "example": "El usuario debe seleccionar qué boletos usarán este cupón"
                     }
                 },
-                "description": "Internal Server Error"
+                "description": "Información de cupones opcionales"
+            },
+            "Discounts": {
+                "type": "object",
+                "properties": {
+                    "global": {
+                        "type": "array",
+                        "description": "Lista de descuentos automáticos que aplican globalmente",
+                        "items": {
+                            "$ref": "#/components/schemas/AppliedDiscount"
+                        }
+                    },
+                    "coupons": {
+                        "type": "array",
+                        "description": "Lista de cupones opcionales como PROMO99",
+                        "items": {
+                            "$ref": "#/components/schemas/Coupon"
+                        }
+                    }
+                },
+                "description": "Contiene los descuentos globales, por tipo de pasajero y cupones opcionales"
             },
             "RoundTripSeatsResponse": {
                 "type": "object",
@@ -1822,35 +1996,35 @@
                         "description": "Precio total para pasajeros con credencial INAPAM (incluye IVA)",
                         "example": 260.0
                     },
-                    "adultIvaPrice": {
+                    "adultTotalPriceLowerDeck": {
                         "type": "number",
-                        "description": "Monto del IVA aplicado al precio total de adultos",
-                        "example": 67.0
+                        "description": "Precio total para pasajeros adultos en planta baja (incluye IVA)",
+                        "example": 550.0
                     },
-                    "childIvaPrice": {
+                    "childTotalPriceLowerDeck": {
                         "type": "number",
-                        "description": "Monto del IVA aplicado al precio total de menores",
-                        "example": 33.5
+                        "description": "Precio total para pasajeros menores en planta baja (incluye IVA)",
+                        "example": 275.0
                     },
-                    "inapamIvaPrice": {
+                    "inapamTotalPriceLowerDeck": {
                         "type": "number",
-                        "description": "Monto del IVA aplicado al precio total de INAPAM",
-                        "example": 33.5
+                        "description": "Precio total para pasajeros con credencial INAPAM en planta baja (incluye IVA)",
+                        "example": 275.0
                     },
-                    "adultSubTotalPrice": {
+                    "adultTotalPriceUpperDeck": {
                         "type": "number",
-                        "description": "Subtotal (sin IVA) para pasajeros adultos",
-                        "example": 453.0
+                        "description": "Precio total para pasajeros adultos en planta alta (incluye IVA)",
+                        "example": 520.0
                     },
-                    "childSubTotalPrice": {
+                    "childTotalPriceUpperDeck": {
                         "type": "number",
-                        "description": "Subtotal (sin IVA) para pasajeros menores",
-                        "example": 226.5
+                        "description": "Precio total para pasajeros menores en planta alta (incluye IVA)",
+                        "example": 260.0
                     },
-                    "inapamSubTotalPrice": {
+                    "inapamTotalPriceUpperDeck": {
                         "type": "number",
-                        "description": "Subtotal (sin IVA) para pasajeros con credencial INAPAM",
-                        "example": 226.5
+                        "description": "Precio total para pasajeros con credencial INAPAM en planta alta (incluye IVA)",
+                        "example": 260.0
                     },
                     "seats": {
                         "type": "array",
@@ -1858,9 +2032,51 @@
                         "items": {
                             "$ref": "#/components/schemas/Seat"
                         }
+                    },
+                    "discounts": {
+                        "$ref": "#/components/schemas/Discounts"
                     }
                 },
                 "description": "Respuesta con la información detallada de asientos disponibles y precios por tipo de pasajero"
+            },
+            "SeatNoContentResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado de la respuesta HTTP",
+                        "format": "int32",
+                        "example": 404
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo de la respuesta",
+                        "example": "Sin contenido disponible para mostrar"
+                    },
+                    "body": {
+                        "type": "object",
+                        "description": "Objeto nulo; no se encontraron asientos disponibles",
+                        "nullable": true
+                    }
+                },
+                "description": "No Content"
+            },
+            "SeatInternalErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Internal Server Error"
+                    }
+                },
+                "description": "Internal Server Error"
             },
             "OriginOkResponse": {
                 "type": "object",
@@ -1930,6 +2146,40 @@
                 "description": "No Content"
             },
             "AuthInternalErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Internal Server Error"
+                    }
+                },
+                "description": "Internal Server Error"
+            },
+            "ItineraryNoContentResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 404
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo de la respuesta",
+                        "example": "No se encontraron itinerarios disponibles con los datos proporcionados"
+                    }
+                },
+                "description": "No Content"
+            },
+            "ItineraryInternalErrorResponse": {
                 "type": "object",
                 "properties": {
                     "code": {
@@ -2062,9 +2312,9 @@
                             "example": "[\"WiFi\",\"Aire acondicionado\"]"
                         }
                     },
-                    "arrivalStationAdress": {
+                    "typeOfTransport": {
                         "type": "string",
-                        "writeOnly": true
+                        "description": "Autobus, Taxi, Urvan (12 pasajeros), Urvan (14 pasajeros), Urvan (17 pasajeros), Urvan (21 pasajeros), Double decker (62 pasajeros), Double decker (64 pasajeros), Double decker (67 pasajeros), Urvan (10 pasajeros)"
                     }
                 },
                 "description": "Respuesta con detalles de itinerarios y tarifas para una ruta de autobús"
@@ -2110,40 +2360,6 @@
                     }
                 },
                 "description": "Success"
-            },
-            "ItineraryNoContentResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 404
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo de la respuesta",
-                        "example": "No se encontraron itinerarios disponibles con los datos proporcionados"
-                    }
-                },
-                "description": "No Content"
-            },
-            "ItineraryInternalErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 500
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Internal Server Error"
-                    }
-                },
-                "description": "Internal Server Error"
             },
             "DestinyOkResponse": {
                 "type": "object",
@@ -2203,22 +2419,6 @@
                 },
                 "description": "Internal Server Error"
             },
-            "HealthOkReponse": {
-                "type": "object",
-                "properties": {
-                    "status": {
-                        "type": "string",
-                        "description": "Estado del servicio",
-                        "example": "UP"
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje que indica el estado de disponibilidad del servicio",
-                        "example": "El servicio está operativo"
-                    }
-                },
-                "description": "Respuesta del estado del servicio"
-            },
             "HealthUnavailableReponse": {
                 "type": "object",
                 "properties": {
@@ -2231,6 +2431,22 @@
                         "type": "string",
                         "description": "Mensaje que indica el estado de disponibilidad del servicio",
                         "example": "El servicio no está disponible temporalmente"
+                    }
+                },
+                "description": "Respuesta del estado del servicio"
+            },
+            "HealthOkReponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "description": "Estado del servicio",
+                        "example": "UP"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje que indica el estado de disponibilidad del servicio",
+                        "example": "El servicio está operativo"
                     }
                 },
                 "description": "Respuesta del estado del servicio"
