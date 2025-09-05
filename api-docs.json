@@ -152,22 +152,22 @@
                     "required": true
                 },
                 "responses": {
-                    "404": {
-                        "description": "Venta cancelada o información inválida",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SaleBadRequestResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Venta confirmada con éxito",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SaleOkResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Venta cancelada o información inválida",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SaleBadRequestResponse"
                                 }
                             }
                         }
@@ -466,12 +466,12 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Asientos obtenidos correctamente",
+                    "500": {
+                        "description": "Error interno del servidor",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SeatOkResponse"
+                                    "$ref": "#/components/schemas/SeatInternalErrorResponse"
                                 }
                             }
                         }
@@ -486,12 +486,12 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "Error interno del servidor",
+                    "200": {
+                        "description": "Asientos obtenidos correctamente",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SeatInternalErrorResponse"
+                                    "$ref": "#/components/schemas/SeatOkResponse"
                                 }
                             }
                         }
@@ -667,22 +667,22 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "Error interno al obtener itinerarios disponibles",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ItineraryInternalErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "429": {
                         "description": "Demasiadas solicitudes",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ItineraryTooManyRequestsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al obtener itinerarios disponibles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItineraryInternalErrorResponse"
                                 }
                             }
                         }
@@ -864,22 +864,22 @@
                 "description": "Genera un token JWT temporal (10 minutos) que puede utilizarse para realizar peticiones autenticadas a otros endpoints del API.",
                 "operationId": "autoLogin",
                 "responses": {
-                    "500": {
-                        "description": "Error interno al generar o almacenar el token",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthInternalErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Token JWT generado exitosamente",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/AuthOkReponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al generar o almacenar el token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthInternalErrorResponse"
                                 }
                             }
                         }
@@ -984,7 +984,7 @@
                         "type": "array",
                         "description": "Lista de asientos asignados a este pasajero",
                         "items": {
-                            "$ref": "#/components/schemas/SeatReserve"
+                            "$ref": "#/components/schemas/SeatSale"
                         }
                     }
                 },
@@ -1076,7 +1076,7 @@
                 },
                 "description": "Cuerpo de la solicitud para hacer la preventa de los boletos"
             },
-            "SeatReserve": {
+            "SeatSale": {
                 "required": [
                     "seatCode",
                     "segmentIndex"
@@ -1191,23 +1191,6 @@
                     }
                 },
                 "description": "Datos devueltos al procesar un pago exitoso."
-            },
-            "SaleBadRequestResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 404
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Ocurrió un error. Por favor, verifica que la información enviada sea correcta"
-                    }
-                },
-                "description": "Bad Request"
             },
             "SaleBodyResponse": {
                 "type": "object",
@@ -1332,6 +1315,23 @@
                     }
                 },
                 "description": "Success"
+            },
+            "SaleBadRequestResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 404
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Ocurrió un error. Por favor, verifica que la información enviada sea correcta"
+                    }
+                },
+                "description": "Bad Request"
             },
             "SaleInternalErrorResponse": {
                 "type": "object",
@@ -1501,7 +1501,7 @@
                             "AMOUNT_DISCOUNT",
                             "PROMO99_PERCENTAGE",
                             "PROMO99_AMOUNT",
-                            "ESPECIAL"
+                            "FREE_TICKETS"
                         ]
                     },
                     "code": {
@@ -1632,6 +1632,32 @@
                 },
                 "description": "Cuerpo de la solicitud para reservar asientos"
             },
+            "SeatReserve": {
+                "required": [
+                    "seatCode",
+                    "segmentIndex"
+                ],
+                "type": "object",
+                "properties": {
+                    "seatCode": {
+                        "type": "string",
+                        "description": "Código del asiento exactamente como lo devuelve el endpoint /seats. Si la unidad no proporciona número de asiento, asignar 0",
+                        "example": "12",
+                        "default": "0"
+                    },
+                    "segmentIndex": {
+                        "type": "integer",
+                        "description": "Índice del segmento al que pertenece el asiento 1=Viaje de ida, 2=Viaje de vuelta",
+                        "format": "int32",
+                        "example": 1,
+                        "enum": [
+                            1,
+                            2
+                        ]
+                    }
+                },
+                "description": "Representa un asiento reservado en un segmento específico del viaje"
+            },
             "ReservationCreateBodyResponse": {
                 "type": "object",
                 "properties": {
@@ -1658,6 +1684,17 @@
                             "created",
                             "cancelled",
                             "unreserved"
+                        ]
+                    },
+                    "discountState": {
+                        "type": "string",
+                        "description": "Estado de aplicación del descuento.",
+                        "example": "applied",
+                        "enum": [
+                            "applied",
+                            "not_applicable",
+                            "expired",
+                            "invalid"
                         ]
                     },
                     "createdAt": {
@@ -1736,6 +1773,45 @@
                 },
                 "description": "Conflict"
             },
+            "SeatInternalErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Internal Server Error"
+                    }
+                },
+                "description": "Internal Server Error"
+            },
+            "SeatNoContentResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado de la respuesta HTTP",
+                        "format": "int32",
+                        "example": 404
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo de la respuesta",
+                        "example": "Sin contenido disponible para mostrar"
+                    },
+                    "body": {
+                        "type": "object",
+                        "description": "Objeto nulo; no se encontraron asientos disponibles",
+                        "nullable": true
+                    }
+                },
+                "description": "No Content"
+            },
             "AppliedDiscount": {
                 "type": "object",
                 "properties": {
@@ -1749,7 +1825,7 @@
                             "AMOUNT_DISCOUNT",
                             "PROMO99_PERCENTAGE",
                             "PROMO99_AMOUNT",
-                            "ESPECIAL"
+                            "FREE_TICKETS"
                         ]
                     },
                     "passengerType": {
@@ -1797,7 +1873,7 @@
                     "code": {
                         "type": "string",
                         "description": "Código del cupón",
-                        "example": "PROMO99"
+                        "example": "BOLETO-ESPECIAL"
                     },
                     "type": {
                         "type": "string",
@@ -1809,23 +1885,23 @@
                             "AMOUNT_DISCOUNT",
                             "PROMO99_PERCENTAGE",
                             "PROMO99_AMOUNT",
-                            "ESPECIAL"
+                            "FREE_TICKETS"
                         ]
                     },
                     "description": {
                         "type": "string",
                         "description": "Descripción del cupón",
-                        "example": "Promoción especial de $99 por boleto"
+                        "example": "Este descuento pone a tu disposición un número limitado de boletos con precios especiales, disponibles en horarios específicos"
                     },
                     "maxSeats": {
                         "type": "integer",
-                        "description": "Número máximo de boletos que puede cubrir el cupón. Si el valor es 0, significa que no hay límite; en caso contrario, está limitado por el valor de remainingSeats",
+                        "description": "Número máximo de boletos que el cupón puede cubrir. Un valor de 0 indica que no existe límite, aunque está restringido por la cantidad disponible en remainingSeats",
                         "format": "int32",
                         "example": 2
                     },
                     "remainingSeats": {
                         "type": "integer",
-                        "description": "Número de boletos restantes que pueden usar el cupón",
+                        "description": "Número de boletos restantes que pueden usar el cupón. Si el valor es 0, significa que no hay límite.",
                         "format": "int32",
                         "example": 1
                     },
@@ -2039,45 +2115,6 @@
                 },
                 "description": "Respuesta con la información detallada de asientos disponibles y precios por tipo de pasajero"
             },
-            "SeatNoContentResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado de la respuesta HTTP",
-                        "format": "int32",
-                        "example": 404
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo de la respuesta",
-                        "example": "Sin contenido disponible para mostrar"
-                    },
-                    "body": {
-                        "type": "object",
-                        "description": "Objeto nulo; no se encontraron asientos disponibles",
-                        "nullable": true
-                    }
-                },
-                "description": "No Content"
-            },
-            "SeatInternalErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 500
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Internal Server Error"
-                    }
-                },
-                "description": "Internal Server Error"
-            },
             "OriginOkResponse": {
                 "type": "object",
                 "properties": {
@@ -2179,23 +2216,6 @@
                 },
                 "description": "No Content"
             },
-            "ItineraryInternalErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 500
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Internal Server Error"
-                    }
-                },
-                "description": "Internal Server Error"
-            },
             "ItineraryTooManyRequestsResponse": {
                 "type": "object",
                 "properties": {
@@ -2212,6 +2232,23 @@
                     }
                 },
                 "description": "Too Many Requests"
+            },
+            "ItineraryInternalErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Internal Server Error"
+                    }
+                },
+                "description": "Internal Server Error"
             },
             "FindBodyResponse": {
                 "type": "object",
@@ -2251,7 +2288,7 @@
                     },
                     "price": {
                         "type": "number",
-                        "description": "Precio base del boleto",
+                        "description": "Precio del boleto adulto más económico (con descuento aplicado, si corresponde)",
                         "example": 450.5
                     },
                     "departureStation": {
@@ -2312,9 +2349,16 @@
                             "example": "[\"WiFi\",\"Aire acondicionado\"]"
                         }
                     },
+                    "typeOfTransportId": {
+                        "type": "integer",
+                        "description": "ID del tipo de transporte - 1=Autobus, 2=Taxi, 3=Urvan (12 pasajeros), 4=Urvan (14 pasajeros), 5=Urvan (17 pasajeros), 6=Urvan (21 pasajeros), 7=Double decker (62 pasajeros),8=Double decker (64 pasajeros), 9=Double decker (67 pasajeros), 10=Urvan (10 pasajeros)",
+                        "format": "int32",
+                        "example": 1
+                    },
                     "typeOfTransport": {
                         "type": "string",
-                        "description": "Autobus, Taxi, Urvan (12 pasajeros), Urvan (14 pasajeros), Urvan (17 pasajeros), Urvan (21 pasajeros), Double decker (62 pasajeros), Double decker (64 pasajeros), Double decker (67 pasajeros), Urvan (10 pasajeros)"
+                        "description": "Autobus, Taxi, Urvan (12 pasajeros), Urvan (14 pasajeros), Urvan (17 pasajeros), Urvan (21 pasajeros), Double decker (62 pasajeros), Double decker (64 pasajeros), Double decker (67 pasajeros), Urvan (10 pasajeros)",
+                        "example": "Autobus"
                     }
                 },
                 "description": "Respuesta con detalles de itinerarios y tarifas para una ruta de autobús"
