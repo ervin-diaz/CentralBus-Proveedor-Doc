@@ -152,6 +152,16 @@
                     "required": true
                 },
                 "responses": {
+                    "500": {
+                        "description": "Error interno al confirmar la venta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SaleInternalErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "200": {
                         "description": "Venta confirmada con éxito",
                         "content": {
@@ -168,16 +178,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SaleBadRequestResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno al confirmar la venta",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SaleInternalErrorResponse"
                                 }
                             }
                         }
@@ -353,6 +353,26 @@
                 }
             }
         },
+        "/api/http-request/reset-counter": {
+            "post": {
+                "tags": [
+                    "http-request-controller"
+                ],
+                "operationId": "resetCounter",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/search/seats": {
             "get": {
                 "tags": [
@@ -455,6 +475,28 @@
                         "example": "2025-08-10T21:30"
                     },
                     {
+                        "name": "unique",
+                        "in": "query",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de ida",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "null"
+                        },
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    {
+                        "name": "return_unique",
+                        "in": "query",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de regreso",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "null"
+                        },
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    {
                         "name": "fare_class",
                         "in": "query",
                         "description": "Clase tarifaria (ej. regular, LUJO, FARE-1, FARE-2, FARE-3)",
@@ -466,16 +508,6 @@
                     }
                 ],
                 "responses": {
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SeatInternalErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "404": {
                         "description": "Sin contenido disponible para mostrar",
                         "content": {
@@ -492,6 +524,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SeatOkResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SeatInternalErrorResponse"
                                 }
                             }
                         }
@@ -657,6 +699,16 @@
                     }
                 ],
                 "responses": {
+                    "200": {
+                        "description": "Itinerarios obtenidos correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItineraryOkResponse"
+                                }
+                            }
+                        }
+                    },
                     "204": {
                         "description": "No se encontraron itinerarios disponibles",
                         "content": {
@@ -683,16 +735,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ItineraryInternalErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "200": {
-                        "description": "Itinerarios obtenidos correctamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ItineraryOkResponse"
                                 }
                             }
                         }
@@ -864,22 +906,22 @@
                 "description": "Genera un token JWT temporal (10 minutos) que puede utilizarse para realizar peticiones autenticadas a otros endpoints del API.",
                 "operationId": "autoLogin",
                 "responses": {
-                    "200": {
-                        "description": "Token JWT generado exitosamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthOkReponse"
-                                }
-                            }
-                        }
-                    },
                     "500": {
                         "description": "Error interno al generar o almacenar el token",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/AuthInternalErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Token JWT generado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthOkReponse"
                                 }
                             }
                         }
@@ -1000,7 +1042,8 @@
                     "fareClass",
                     "locale",
                     "marketingCarrier",
-                    "passengers"
+                    "passengers",
+                    "unique"
                 ],
                 "type": "object",
                 "properties": {
@@ -1037,6 +1080,16 @@
                         "type": "string",
                         "description": "Fecha y hora de llegada del viaje de regreso (opcional), en formato ISO 8601",
                         "example": "2025-08-07T09:00"
+                    },
+                    "unique": {
+                        "type": "string",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de ida.",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    "returnUnique": {
+                        "type": "string",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de regreso.",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
                     },
                     "locale": {
                         "type": "string",
@@ -1192,6 +1245,23 @@
                 },
                 "description": "Datos devueltos al procesar un pago exitoso."
             },
+            "SaleInternalErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Ocurrió un error. Por favor, verifica que la información enviada sea correcta"
+                    }
+                },
+                "description": "Internal Server Error"
+            },
             "SaleBodyResponse": {
                 "type": "object",
                 "properties": {
@@ -1333,23 +1403,6 @@
                 },
                 "description": "Bad Request"
             },
-            "SaleInternalErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 500
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Ocurrió un error. Por favor, verifica que la información enviada sea correcta"
-                    }
-                },
-                "description": "Internal Server Error"
-            },
             "UnReserveSeatOkResponse": {
                 "type": "object",
                 "properties": {
@@ -1371,12 +1424,25 @@
                 "description": "Success"
             },
             "UnreservationCreateBodyResponse": {
+                "required": [
+                    "unique"
+                ],
                 "type": "object",
                 "properties": {
                     "id": {
                         "type": "string",
                         "description": "Identificador único de la reservación eliminada",
                         "example": "RMTKIQXD"
+                    },
+                    "unique": {
+                        "type": "string",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de ida.",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    "uniqueReturn": {
+                        "type": "string",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de regreso.",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
                     },
                     "type": {
                         "type": "string",
@@ -1556,7 +1622,8 @@
                     "fareClass",
                     "locale",
                     "marketingCarrier",
-                    "passengers"
+                    "passengers",
+                    "unique"
                 ],
                 "type": "object",
                 "properties": {
@@ -1593,6 +1660,16 @@
                         "type": "string",
                         "description": "Fecha y hora de llegada del viaje de regreso (opcional), en formato ISO 8601",
                         "example": "2025-08-07T09:00"
+                    },
+                    "unique": {
+                        "type": "string",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de ida.",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    "returnUnique": {
+                        "type": "string",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar el viaje de regreso.",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
                     },
                     "locale": {
                         "type": "string",
@@ -1772,23 +1849,6 @@
                     }
                 },
                 "description": "Conflict"
-            },
-            "SeatInternalErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 500
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Internal Server Error"
-                    }
-                },
-                "description": "Internal Server Error"
             },
             "SeatNoContentResponse": {
                 "type": "object",
@@ -2115,6 +2175,23 @@
                 },
                 "description": "Respuesta con la información detallada de asientos disponibles y precios por tipo de pasajero"
             },
+            "SeatInternalErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Internal Server Error"
+                    }
+                },
+                "description": "Internal Server Error"
+            },
             "OriginOkResponse": {
                 "type": "object",
                 "properties": {
@@ -2199,57 +2276,6 @@
                 },
                 "description": "Internal Server Error"
             },
-            "ItineraryNoContentResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 404
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo de la respuesta",
-                        "example": "No se encontraron itinerarios disponibles con los datos proporcionados"
-                    }
-                },
-                "description": "No Content"
-            },
-            "ItineraryTooManyRequestsResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 429
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Nuestros servidores recibieron demasiadas peticiones. Por favor, intenta nuevamente en un minuto"
-                    }
-                },
-                "description": "Too Many Requests"
-            },
-            "ItineraryInternalErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "code": {
-                        "type": "integer",
-                        "description": "Código de estado HTTP",
-                        "format": "int32",
-                        "example": 500
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "Mensaje descriptivo del error",
-                        "example": "Internal Server Error"
-                    }
-                },
-                "description": "Internal Server Error"
-            },
             "FindBodyResponse": {
                 "type": "object",
                 "properties": {
@@ -2270,9 +2296,9 @@
                     },
                     "duration": {
                         "type": "integer",
-                        "description": "Duración del viaje en minutos",
+                        "description": "Duración del viaje en segundos",
                         "format": "int64",
-                        "example": 150
+                        "example": 10800
                     },
                     "fareClassCode": {
                         "type": "string",
@@ -2325,6 +2351,11 @@
                         "type": "string",
                         "description": "ID del operador o línea de autobús",
                         "example": "MARK123"
+                    },
+                    "unique": {
+                        "type": "string",
+                        "description": "Identificador único (UUID) generado por sesión para diferenciar viajes con mismos horarios.",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
                     },
                     "tradeNameMarketingCarrier": {
                         "type": "string",
@@ -2404,6 +2435,57 @@
                     }
                 },
                 "description": "Success"
+            },
+            "ItineraryNoContentResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 404
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo de la respuesta",
+                        "example": "No se encontraron itinerarios disponibles con los datos proporcionados"
+                    }
+                },
+                "description": "No Content"
+            },
+            "ItineraryTooManyRequestsResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 429
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Nuestros servidores recibieron demasiadas peticiones. Por favor, intenta nuevamente en un minuto"
+                    }
+                },
+                "description": "Too Many Requests"
+            },
+            "ItineraryInternalErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "description": "Código de estado HTTP",
+                        "format": "int32",
+                        "example": 500
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Internal Server Error"
+                    }
+                },
+                "description": "Internal Server Error"
             },
             "DestinyOkResponse": {
                 "type": "object",
